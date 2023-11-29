@@ -23,7 +23,20 @@ public class SecurityConfig {
     @Bean
     public UserDetailsManager userDetailsManager(DataSource dataSource) {
 
-        return new JdbcUserDetailsManager(dataSource);
+        // when using custom tables for fetching user details
+        JdbcUserDetailsManager jdbcUserDetailsManager = new JdbcUserDetailsManager(dataSource);
+
+        jdbcUserDetailsManager.setUsersByUsernameQuery(
+                "select user_id, pw, active from members where user_id =?");
+
+        jdbcUserDetailsManager.setAuthoritiesByUsernameQuery(
+                "select user_id, role from roles where user_id =?");
+
+        return jdbcUserDetailsManager;
+
+        // below when using spring jdbc compliant mysql db tables for fetching user
+        // details
+        // return new JdbcUserDetailsManager(dataSource);
     }
 
     // for authentication - In Memory user details stored for authentication
